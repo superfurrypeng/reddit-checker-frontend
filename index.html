@@ -1,321 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reddit Shadowban Scanner</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Shadowban Checker</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #7b2ff7, #f107a3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      color: white;
-    }
-
-    header {
-      width: 100%;
-      padding: 15px 0;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.25);
-      font-size: 1.5rem;
-      font-weight: bold;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-
-    .container {
-      background: white;
-      color: black;
-      padding: 30px;
-      border-radius: 12px;
-      text-align: center;
-      width: 340px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      margin-top: 100px;
-      animation: fadeIn 0.8s ease-in-out;
-    }
-
-    input {
-      padding: 10px;
-      width: 90%;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    button.check {
-      padding: 10px;
-      width: 95%;
-      margin-top: 5px;
-      background: #7b2ff7;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: 0.3s;
-    }
-
-    button.check:hover {
-      background: #5a1ccf;
-    }
-
-    button.history-btn {
-      background: #ddd;
-      color: black;
-      margin-top: 5px;
-    }
-
-    #result {
-      margin-top: 15px;
-      font-weight: bold;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-
-    #result.show {
-      opacity: 1;
-    }
-
-    .history-container {
-      display: none;
-      margin-top: 15px;
-      text-align: left;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-
-    th, td {
-      padding: 8px;
-    }
-
-    footer {
-      margin-top: 20px;
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    footer button {
-      margin: 0 5px;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 6px;
-      background: white;
-      color: #7b2ff7;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    footer button:hover {
-      background: #eee;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: white;
-      color: black;
+      max-width: 600px;
+      margin: auto;
       padding: 20px;
-      border-radius: 10px;
-      width: 300px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
-
-    .modal-content button {
-      margin-top: 10px;
-      background: #7b2ff7;
-      color: white;
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
+    h1, h2 { text-align: center; }
+    .tab-buttons button {
+      padding: 10px;
+      margin: 5px;
       cursor: pointer;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    textarea { width: 100%; height: 100px; }
+    .result { padding: 10px; margin: 5px 0; border: 1px solid #ddd; }
   </style>
 </head>
 <body>
-  <header>🚀 Reddit Shadowban Scanner</header>
+  <h1>Reddit Shadowban Checker</h1>
 
-  <div class="container">
-    <h1>Check Reddit Accounts Instantly</h1>
-    <p>Find out if a Reddit username is active or shadowbanned in seconds.</p>
-
-    <input id="username" placeholder="Enter Reddit username" />
-    <button class="check" onclick="checkUsername()">🔍 Check</button>
-    <button class="check history-btn" onclick="toggleHistory()">📜 Show History</button>
-
-    <p id="result"></p>
-
-    <div class="history-container" id="history">
-      <h3>History</h3>
-      <table>
-        <thead>
-          <tr><th>Username</th><th>Status</th><th>Date</th></tr>
-        </thead>
-        <tbody id="history-body"></tbody>
-      </table>
-    </div>
-
-    <footer>
-      © 2025 Jack Hamnett <br><br>
-      <button onclick="openModal('aboutModal')">About</button>
-      <button onclick="openModal('contactModal')">Contact</button>
-    </footer>
+  <div class="tab-buttons">
+    <button onclick="showTab('single')">Single Check</button>
+    <button onclick="showTab('bulk')">Bulk Check</button>
   </div>
 
-  <!-- About Modal -->
-  <div id="aboutModal" class="modal">
-    <div class="modal-content">
-      <h3>About</h3>
-      <p>
-        Reddit Shadowban Scanner is <b>completely free</b> to use.  
-        Donations help cover server costs and allow us to improve the service with more features.
-      </p>
-      <p>💖 If you find this tool useful, consider donating to keep it running!</p>
-
-      <a href="https://www.paypal.com/donate/?hosted_button_id=HJWC7YFZZC6V4" target="_blank">
-        <button style="background:#7b2ff7; color:white; padding:10px 15px; border:none; border-radius:6px; cursor:pointer;">
-          💸 Donate with PayPal
-        </button>
-      </a>
-
-      <button onclick="closeModal('aboutModal')" style="margin-top:10px;">Close</button>
-    </div>
+  <div id="single" class="tab active">
+    <h2>Single Username Check</h2>
+    <input type="text" id="singleUser" placeholder="Enter Reddit username">
+    <button onclick="singleCheck()">Check</button>
+    <div id="singleResult"></div>
   </div>
 
-  <!-- Contact Modal -->
-  <div id="contactModal" class="modal">
-    <div class="modal-content">
-      <h3>Contact Us</h3>
-      <p>📨 Telegram: <b>@Sinfluenceofm</b></p>
-      <button onclick="closeModal('contactModal')">Close</button>
-    </div>
+  <div id="bulk" class="tab">
+    <h2>Bulk Username Check</h2>
+    <input type="text" id="bulkCode" placeholder="Enter Access Code">
+    <textarea id="bulkUsers" placeholder="Enter usernames separated by spaces or commas"></textarea>
+    <button onclick="bulkCheck()">Bulk Check</button>
+    <div id="bulkResult"></div>
   </div>
 
   <script>
-    function getCheckData() {
-      const data = JSON.parse(localStorage.getItem("checkData") || "{}");
-      const now = Date.now();
-      if (!data.date || now - data.date > 24 * 60 * 60 * 1000) {
-        return { count: 0, date: now };
+    const API_URL = "https://reddit-checker-8j5n.onrender.com";
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+    }
+
+    async function singleCheck() {
+      const user = document.getElementById("singleUser").value.trim();
+      if (!user) return alert("Enter a username");
+
+      const res = await fetch(`${API_URL}/check/${encodeURIComponent(user)}`);
+      const data = await res.json();
+      document.getElementById("singleResult").innerHTML =
+        `<div class="result">${user} → ${data.exists ? "✅ Exists" : "❌ Shadowbanned/Not Found"}</div>`;
+    }
+
+    async function bulkCheck() {
+      const code = document.getElementById("bulkCode").value.trim();
+      let users = document.getElementById("bulkUsers").value.trim();
+      if (!users || !code) return alert("Enter both code and usernames");
+
+      users = users.replace(/\s+/g, ",").split(",").map(u => u.trim()).filter(u => u);
+
+      const res = await fetch(`${API_URL}/bulk-check`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usernames: users, code })
+      });
+
+      const data = await res.json();
+      if (data.error) {
+        document.getElementById("bulkResult").innerHTML = `<div class="result">❌ ${data.error}</div>`;
+      } else {
+        let html = `<p>Remaining Uses: ${data.remaining}</p>`;
+        data.results.forEach(r => {
+          html += `<div class="result">${r.username} → ${r.exists ? "✅ Exists" : "❌ Shadowbanned/Not Found"}</div>`;
+        });
+        document.getElementById("bulkResult").innerHTML = html;
       }
-      return data;
-    }
-
-    function saveCheckData(data) {
-      localStorage.setItem("checkData", JSON.stringify(data));
-    }
-
-    function getHistory() {
-      return JSON.parse(localStorage.getItem("historyData") || "[]");
-    }
-
-    function saveHistory(history) {
-      localStorage.setItem("historyData", JSON.stringify(history.slice(0, 50)));
-    }
-
-    let historyData = getHistory();
-    updateHistoryTable();
-
-    function toggleHistory() {
-      const historyDiv = document.getElementById("history");
-      historyDiv.style.display = historyDiv.style.display === "block" ? "none" : "block";
-      updateHistoryTable();
-    }
-
-    function updateHistoryTable() {
-      const tbody = document.getElementById("history-body");
-      tbody.innerHTML = historyData.map(h => 
-        `<tr><td>${h.username}</td><td>${h.status}</td><td>${h.date}</td></tr>`
-      ).join("");
-    }
-
-    async function checkUsername() {
-      const username = document.getElementById("username").value.trim();
-      const resultEl = document.getElementById("result");
-      const checkData = getCheckData();
-
-      if (checkData.count >= 50) {
-        resultEl.textContent = "⚠️ You have reached your free daily limit of 50 checks. Upgrade for unlimited checks!";
-        resultEl.style.color = "red";
-        resultEl.classList.add("show");
-        return;
-      }
-
-      if (!username) {
-        resultEl.textContent = "⚠️ Please enter a username";
-        resultEl.style.color = "red";
-        resultEl.classList.add("show");
-        return;
-      }
-
-      try {
-        const res = await fetch(`https://reddit-checker-8j5n.onrender.com/check/${encodeURIComponent(username)}`);
-        const data = await res.json();
-        const now = new Date().toLocaleString();
-
-        let statusText;
-        if (data.exists) {
-          statusText = "Active";
-          resultEl.textContent = `✅ Username "${data.name}" is active and NOT shadowbanned`;
-          resultEl.style.color = "green";
-        } else {
-          statusText = "Banned/Not Found";
-          resultEl.textContent = `❌ Username "${username}" is shadowbanned or does not exist`;
-          resultEl.style.color = "red";
-        }
-
-        historyData.unshift({ username, status: statusText, date: now });
-        saveHistory(historyData);
-
-        if (historyData.length > 50) historyData.pop();
-        updateHistoryTable();
-        resultEl.classList.add("show");
-
-        checkData.count++;
-        checkData.date = Date.now();
-        saveCheckData(checkData);
-
-      } catch {
-        resultEl.textContent = "⚠️ Error checking username";
-        resultEl.style.color = "red";
-        resultEl.classList.add("show");
-      }
-    }
-
-    function openModal(id) {
-      document.getElementById(id).style.display = "flex";
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = "none";
     }
   </script>
 </body>
