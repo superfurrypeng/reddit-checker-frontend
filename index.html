@@ -1,114 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reddit Shadowban Checker</title>
-<style>
-  body {
-    margin: 0; font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#a32 & #5c0);
-    color: white; min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .container { background: white; color: #222;
-    border-radius: 8px; padding: 24px;
-    max-width: 400px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  }
-  h1 { margin-top: 0; text-align: center; color: #4a148c; }
-  .tabs { display: flex; margin-bottom: 16px; }
-  .tab {
-    flex: 1; padding: 8px; cursor: pointer;
-    text-align: center; border-radius: 4px 4px 0 0;
-    background: #ccc; color: #333; user-select: none;
-  }
-  .tab.active { background: #4a148c; color: white; }
-  .form { display: none; }
-  .form.active { display: block; }
-  input[type=text], textarea {
-    width: 100%; padding: 8px; margin: 8px 0;
-    border: 1px solid #aaa; border-radius: 4px;
-  }
-  button {
-    background: #4a148c; color: white;
-    border: none; padding: 12px 16px;
-    border-radius: 4px; cursor: pointer; width: 100%;
-    margin-top: 8px; font-size: 16px;
-  }
-  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-  table, th, td { border: 1px solid #ccc; }
-  th, td { padding: 8px; text-align: left; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reddit Shadowban Checker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      text-align: center;
+    }
+    header {
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 500px;
+      background: white;
+      color: black;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 6px 18px rgba(0,0,0,0.2);
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    .tabs button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .tabs button.active {
+      background: #6a11cb;
+      color: white;
+      border-radius: 8px;
+    }
+    .tabs button:hover {
+      background: #2575fc;
+      color: white;
+    }
+    input, textarea {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button.check-btn {
+      background: #6a11cb;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button.check-btn:hover {
+      background: #2575fc;
+    }
+    .result-box {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f0f0f0;
+      color: black;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    footer {
+      margin-top: 40px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .paypal-btn {
+      margin-top: 20px;
+      display: inline-block;
+      background: #ffc439;
+      color: black;
+      padding: 10px 20px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    .paypal-btn:hover {
+      background: #ffb347;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>🚀 Reddit Shadowban Checker</h1>
-  <div class="tabs">
-    <div id="tabSingle" class="tab active">Single Check</div>
-    <div id="tabBulk" class="tab">Bulk Check</div>
+
+  <header>🚀 Reddit Shadowban Checker</header>
+
+  <div class="container">
+    <div class="tabs">
+      <button id="singleTab" class="active">Single Check</button>
+      <button id="bulkTab">Bulk Check</button>
+    </div>
+
+    <div id="singleSection">
+      <input id="singleUsername" type="text" placeholder="Enter Reddit username" />
+      <button class="check-btn" onclick="checkSingle()">Check</button>
+      <div id="singleResult" class="result-box"></div>
+    </div>
+
+    <div id="bulkSection" style="display:none;">
+      <input id="codeInput" type="text" placeholder="Enter your API code" />
+      <textarea id="bulkUsernames" rows="4" placeholder="Enter usernames separated by space or comma"></textarea>
+      <button class="check-btn" onclick="checkBulk()">Check Bulk</button>
+      <div id="bulkResult" class="result-box"></div>
+    </div>
   </div>
-  <!-- Single -->
-  <div id="singleForm" class="form active">
-    <input id="singleInput" type="text" placeholder="Enter Reddit username">
-    <button onclick="singleCheck()">Check</button>
-    <div id="singleResult" style="margin-top:12px;"></div>
-  </div>
-  <!-- Bulk -->
-  <div id="bulkForm" class="form">
-    <input id="codeInput" type="text" placeholder="Enter admin code (e.g. TEST123)">
-    <textarea id="bulkInput" rows="6" placeholder="Enter usernames separated by comma or space"></textarea>
-    <button onclick="bulkCheck()">Bulk Check</button>
-    <div id="bulkResult"></div>
-  </div>
-</div>
 
-<script>
-const API = '<YOUR BACKEND URL>/check';
-document.getElementById('tabSingle').onclick = () => switchTab('single');
-document.getElementById('tabBulk').onclick = () => switchTab('bulk');
+  <a href="#" class="paypal-btn">💳 Buy More Checks</a>
 
-function switchTab(tab) {
-  document.getElementById('tabSingle').classList.remove('active');
-  document.getElementById('tabBulk').classList.remove('active');
-  document.getElementById('singleForm').classList.remove('active');
-  document.getElementById('bulkForm').classList.remove('active');
-  if (tab === 'single') {
-    document.getElementById('tabSingle').classList.add('active');
-    document.getElementById('singleForm').classList.add('active');
-  } else {
-    document.getElementById('tabBulk').classList.add('active');
-    document.getElementById('bulkForm').classList.add('active');
-  }
-}
+  <footer>© 2025 Reddit Shadowban Checker | About | Contact</footer>
 
-async function singleCheck() {
-  const username = document.getElementById('singleInput').value.trim();
-  if (!username) return alert('Enter a username');
-  const res = await fetch(API + '?user=' + encodeURIComponent(username));
-  const data = await res.json();
-  document.getElementById('singleResult').textContent =
-    data.exists ? `${username} exists` : `${username} does NOT exist`;
-}
+  <script>
+    const backendUrl = "https://reddit-checker-8j5n.onrender.com";
 
-async function bulkCheck() {
-  const code = document.getElementById('codeInput').value.trim();
-  const text = document.getElementById('bulkInput').value.trim();
-  if (!code || !text) return alert('Enter code and usernames');
-  const users = text.split(/[\s,]+/).filter(u=>u);
-  const res = await fetch(API + '/bulk', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ code, users })
-  });
-  const data = await res.json();
-  if (data.error) return alert(data.error);
-  let html = '<table><tr><th>User</th><th>Exists</th><th>Details</th></tr>';
-  data.results.forEach(r => {
-    html += `<tr><td>${r.username}</td><td>${r.exists}</td><td>${r.debug||''}</td></tr>`;
-  });
-  html += '</table>';
-  document.getElementById('bulkResult').innerHTML = html;
-}
-</script>
+    // Tab switching
+    document.getElementById("singleTab").addEventListener("click", () => {
+      document.getElementById("singleSection").style.display = "block";
+      document.getElementById("bulkSection").style.display = "none";
+      document.getElementById("singleTab").classList.add("active");
+      document.getElementById("bulkTab").classList.remove("active");
+    });
+
+    document.getElementById("bulkTab").addEventListener("click", () => {
+      document.getElementById("singleSection").style.display = "none";
+      document.getElementById("bulkSection").style.display = "block";
+      document.getElementById("bulkTab").classList.add("active");
+      document.getElementById("singleTab").classList.remove("active");
+    });
+
+    // Single check function
+    async function checkSingle() {
+      const username = document.getElementById("singleUsername").value;
+      const res = await fetch(`${backendUrl}/check?user=${username}`);
+      const data = await res.json();
+      document.getElementById("singleResult").innerText =
+        data.exists ? `${username} ✅ Exists` : `${username} ❌ Does not exist`;
+    }
+
+    // Bulk check function
+    async function checkBulk() {
+      const code = document.getElementById("codeInput").value.trim();
+      const rawUsernames = document.getElementById("bulkUsernames").value.trim();
+      const users = rawUsernames.split(/[\s,]+/).filter(Boolean);
+
+      const res = await fetch(`${backendUrl}/check/bulk`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, users })
+      });
+
+      const data = await res.json();
+      if (!data.results) {
+        document.getElementById("bulkResult").innerText = data.error || "Error occurred.";
+        return;
+      }
+
+      let html = "<strong>Results:</strong><br/>";
+      data.results.forEach(r => {
+        html += `${r.username}: ${r.exists ? "✅ Exists" : "❌ Does not exist"}<br/>`;
+      });
+      document.getElementById("bulkResult").innerHTML = html;
+    }
+  </script>
 </body>
 </html>
