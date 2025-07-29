@@ -1,83 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reddit Shadowban Checker</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
-    h1 { font-size: 26px; }
-    input, textarea { padding: 8px; margin: 6px; }
-    button { padding: 8px 14px; margin: 6px; cursor: pointer; }
-    table { margin-top: 20px; border-collapse: collapse; width: 60%; }
-    table, th, td { border: 1px solid black; padding: 6px; }
-    #bulkSection { display: none; margin-top: 20px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reddit Shadowban Checker</title>
+<style>
+  body {
+    margin: 0; font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#a32 & #5c0);
+    color: white; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .container { background: white; color: #222;
+    border-radius: 8px; padding: 24px;
+    max-width: 400px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  h1 { margin-top: 0; text-align: center; color: #4a148c; }
+  .tabs { display: flex; margin-bottom: 16px; }
+  .tab {
+    flex: 1; padding: 8px; cursor: pointer;
+    text-align: center; border-radius: 4px 4px 0 0;
+    background: #ccc; color: #333; user-select: none;
+  }
+  .tab.active { background: #4a148c; color: white; }
+  .form { display: none; }
+  .form.active { display: block; }
+  input[type=text], textarea {
+    width: 100%; padding: 8px; margin: 8px 0;
+    border: 1px solid #aaa; border-radius: 4px;
+  }
+  button {
+    background: #4a148c; color: white;
+    border: none; padding: 12px 16px;
+    border-radius: 4px; cursor: pointer; width: 100%;
+    margin-top: 8px; font-size: 16px;
+  }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  table, th, td { border: 1px solid #ccc; }
+  th, td { padding: 8px; text-align: left; }
+</style>
 </head>
 <body>
-
-  <h1>Reddit Shadowban Checker</h1>
-
-  <h2>Single Username Check</h2>
-  <input type="text" id="username" placeholder="Enter Reddit username">
-  <button onclick="checkUser()">Check</button>
-  <p id="result"></p>
-
-  <div style="margin-top:30px;">
-    <button id="bulkTab">Bulk Check</button>
+<div class="container">
+  <h1>🚀 Reddit Shadowban Checker</h1>
+  <div class="tabs">
+    <div id="tabSingle" class="tab active">Single Check</div>
+    <div id="tabBulk" class="tab">Bulk Check</div>
   </div>
-
-  <div id="bulkSection">
-    <h2>Bulk Username Check</h2>
-    <input type="text" id="accessCode" placeholder="Enter Access Code"><br>
-    <textarea id="bulkUsernames" placeholder="Enter usernames separated by space or comma" rows="6" cols="40"></textarea><br>
-    <button onclick="runBulkCheck()">Check Usernames</button>
+  <!-- Single -->
+  <div id="singleForm" class="form active">
+    <input id="singleInput" type="text" placeholder="Enter Reddit username">
+    <button onclick="singleCheck()">Check</button>
+    <div id="singleResult" style="margin-top:12px;"></div>
+  </div>
+  <!-- Bulk -->
+  <div id="bulkForm" class="form">
+    <input id="codeInput" type="text" placeholder="Enter admin code (e.g. TEST123)">
+    <textarea id="bulkInput" rows="6" placeholder="Enter usernames separated by comma or space"></textarea>
+    <button onclick="bulkCheck()">Bulk Check</button>
     <div id="bulkResult"></div>
   </div>
+</div>
 
-  <script>
-    function checkUser() {
-      const username = document.getElementById("username").value.trim();
-      fetch(`https://reddit-checker-8j5n.onrender.com/check/${encodeURIComponent(username)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.exists) {
-            document.getElementById("result").innerText = `${username} exists ✅`;
-          } else {
-            document.getElementById("result").innerText = `${username} does not exist ❌`;
-          }
-        });
-    }
+<script>
+const API = '<YOUR BACKEND URL>/check';
+document.getElementById('tabSingle').onclick = () => switchTab('single');
+document.getElementById('tabBulk').onclick = () => switchTab('bulk');
 
-    document.getElementById("bulkTab").addEventListener("click", function () {
-      document.getElementById("bulkSection").style.display = "block";
-    });
+function switchTab(tab) {
+  document.getElementById('tabSingle').classList.remove('active');
+  document.getElementById('tabBulk').classList.remove('active');
+  document.getElementById('singleForm').classList.remove('active');
+  document.getElementById('bulkForm').classList.remove('active');
+  if (tab === 'single') {
+    document.getElementById('tabSingle').classList.add('active');
+    document.getElementById('singleForm').classList.add('active');
+  } else {
+    document.getElementById('tabBulk').classList.add('active');
+    document.getElementById('bulkForm').classList.add('active');
+  }
+}
 
-    function runBulkCheck() {
-      const code = document.getElementById("accessCode").value.trim();
-      const usernamesInput = document.getElementById("bulkUsernames").value.trim();
-      const usernames = usernamesInput.split(/[\s,]+/);
+async function singleCheck() {
+  const username = document.getElementById('singleInput').value.trim();
+  if (!username) return alert('Enter a username');
+  const res = await fetch(API + '?user=' + encodeURIComponent(username));
+  const data = await res.json();
+  document.getElementById('singleResult').textContent =
+    data.exists ? `${username} exists` : `${username} does NOT exist`;
+}
 
-      fetch("https://reddit-checker-8j5n.onrender.com/bulk-check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, usernames })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.error) {
-            alert(data.error);
-          } else {
-            let html = "<table><tr><th>Username</th><th>Status</th></tr>";
-            data.results.forEach(r => {
-              html += `<tr><td>${r.username}</td><td>${r.exists ? "✅ Exists" : "❌ Not Found"}</td></tr>`;
-            });
-            html += "</table>";
-            document.getElementById("bulkResult").innerHTML = html;
-          }
-        });
-    }
-  </script>
-
+async function bulkCheck() {
+  const code = document.getElementById('codeInput').value.trim();
+  const text = document.getElementById('bulkInput').value.trim();
+  if (!code || !text) return alert('Enter code and usernames');
+  const users = text.split(/[\s,]+/).filter(u=>u);
+  const res = await fetch(API + '/bulk', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ code, users })
+  });
+  const data = await res.json();
+  if (data.error) return alert(data.error);
+  let html = '<table><tr><th>User</th><th>Exists</th><th>Details</th></tr>';
+  data.results.forEach(r => {
+    html += `<tr><td>${r.username}</td><td>${r.exists}</td><td>${r.debug||''}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('bulkResult').innerHTML = html;
+}
+</script>
 </body>
 </html>
