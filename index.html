@@ -5,151 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reddit Shadowban Checker</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #7b2ff7, #f107a3);
-      color: white;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-    header {
-      background: rgba(0, 0, 0, 0.2);
-      padding: 15px;
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-    .tabs {
-      margin-top: 20px;
-    }
-    .tabs button {
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .tabs button.active {
-      background: #fff;
-      color: #7b2ff7;
-    }
-    .tab-content {
-      display: none;
-      background: white;
-      color: black;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 10px;
-      width: 350px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
-    }
-    .tab-content.active { display: block; }
-    input, textarea {
-      width: 90%;
-      margin: 8px 0;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button.action {
-      background: #7b2ff7;
-      color: white;
-      padding: 10px;
-      width: 95%;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button.action:hover { background: #5a1ccf; }
-    .result {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      font-size: 0.9rem;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+    h1 { font-size: 26px; }
+    input, textarea { padding: 8px; margin: 6px; }
+    button { padding: 8px 14px; margin: 6px; cursor: pointer; }
+    table { margin-top: 20px; border-collapse: collapse; width: 60%; }
+    table, th, td { border: 1px solid black; padding: 6px; }
+    #bulkSection { display: none; margin-top: 20px; }
   </style>
 </head>
 <body>
 
-<header>🚀 Reddit Shadowban Checker</header>
+  <h1>Reddit Shadowban Checker</h1>
 
-<div class="tabs">
-  <button id="singleBtn" onclick="showTab('single')" class="active">Single Check</button>
-  <button id="bulkBtn" onclick="showTab('bulk')">Bulk Check</button>
-</div>
-
-<div id="single" class="tab-content active">
   <h2>Single Username Check</h2>
-  <input type="text" id="singleUser" placeholder="Enter Reddit username">
-  <button class="action" onclick="singleCheck()">Check</button>
-  <p id="singleResult" class="result"></p>
-</div>
+  <input type="text" id="username" placeholder="Enter Reddit username">
+  <button onclick="checkUser()">Check</button>
+  <p id="result"></p>
 
-<div id="bulk" class="tab-content">
-  <h2>Bulk Username Check</h2>
-  <input type="text" id="bulkCode" placeholder="Enter Your Code">
-  <textarea id="bulkUsers" placeholder="Enter usernames (space or comma separated)"></textarea>
-  <button class="action" onclick="bulkCheck()">Check Bulk</button>
-  <div id="bulkResult" class="result"></div>
-</div>
+  <div style="margin-top:30px;">
+    <button id="bulkTab">Bulk Check</button>
+  </div>
 
-<script>
-  const API_URL = "https://reddit-checker-8j5n.onrender.com";
+  <div id="bulkSection">
+    <h2>Bulk Username Check</h2>
+    <input type="text" id="accessCode" placeholder="Enter Access Code"><br>
+    <textarea id="bulkUsernames" placeholder="Enter usernames separated by space or comma" rows="6" cols="40"></textarea><br>
+    <button onclick="runBulkCheck()">Check Usernames</button>
+    <div id="bulkResult"></div>
+  </div>
 
-  function showTab(tab) {
-    document.getElementById("single").classList.remove("active");
-    document.getElementById("bulk").classList.remove("active");
-    document.getElementById("singleBtn").classList.remove("active");
-    document.getElementById("bulkBtn").classList.remove("active");
-    document.getElementById(tab).classList.add("active");
-    document.getElementById(tab + "Btn").classList.add("active");
-  }
+  <script>
+    function checkUser() {
+      const username = document.getElementById("username").value.trim();
+      fetch(`https://reddit-checker-8j5n.onrender.com/check/${encodeURIComponent(username)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.exists) {
+            document.getElementById("result").innerText = `${username} exists ✅`;
+          } else {
+            document.getElementById("result").innerText = `${username} does not exist ❌`;
+          }
+        });
+    }
 
-  async function singleCheck() {
-    const user = document.getElementById("singleUser").value.trim();
-    if (!user) return alert("Enter a username");
-    const res = await fetch(`${API_URL}/check/${encodeURIComponent(user)}`);
-    const data = await res.json();
-    document.getElementById("singleResult").textContent =
-      data.exists ? `✅ ${user} exists` : `❌ ${user} is shadowbanned or does not exist`;
-  }
-
-  async function bulkCheck() {
-    const code = document.getElementById("bulkCode").value.trim();
-    let users = document.getElementById("bulkUsers").value.trim();
-    if (!users || !code) return alert("Enter both code and usernames");
-    const usernames = users.replace(/\s+/g, ",").split(",").map(u => u.trim()).filter(Boolean);
-
-    const res = await fetch(`${API_URL}/bulk-check`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ usernames: usernames.join(" "), code })
+    document.getElementById("bulkTab").addEventListener("click", function () {
+      document.getElementById("bulkSection").style.display = "block";
     });
 
-    const data = await res.json();
-    if (data.error) {
-      document.getElementById("bulkResult").innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
-    } else {
-      let html = `<p>Remaining Uses: ${data.remaining}</p><table><tr><th>Username</th><th>Status</th></tr>`;
-      data.results.forEach(r => {
-        html += `<tr><td>${r.username}</td><td>${r.exists ? "✅ Exists" : "❌ Shadowbanned/Not Found"}</td></tr>`;
-      });
-      html += "</table>";
-      document.getElementById("bulkResult").innerHTML = html;
+    function runBulkCheck() {
+      const code = document.getElementById("accessCode").value.trim();
+      const usernamesInput = document.getElementById("bulkUsernames").value.trim();
+      const usernames = usernamesInput.split(/[\s,]+/);
+
+      fetch("https://reddit-checker-8j5n.onrender.com/bulk-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, usernames })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+          } else {
+            let html = "<table><tr><th>Username</th><th>Status</th></tr>";
+            data.results.forEach(r => {
+              html += `<tr><td>${r.username}</td><td>${r.exists ? "✅ Exists" : "❌ Not Found"}</td></tr>`;
+            });
+            html += "</table>";
+            document.getElementById("bulkResult").innerHTML = html;
+          }
+        });
     }
-  }
-</script>
+  </script>
 
 </body>
 </html>
