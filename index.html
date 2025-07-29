@@ -3,103 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reddit Shadowban Checker</title>
+  <title>Reddit Shadowban Scanner</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #6a11cb, #2575fc);
       color: white;
-      text-align: center;
     }
     header {
-      padding: 20px;
-      font-size: 28px;
-      font-weight: bold;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 15px 40px;
+      position: sticky; top: 0; z-index: 100;
     }
-    .container {
-      max-width: 500px;
-      background: white;
-      color: black;
-      margin: 40px auto;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0px 6px 18px rgba(0,0,0,0.2);
+    header h1 { font-size: 22px; font-weight: bold; }
+    header nav a {
+      margin-left: 20px; color: white; text-decoration: none;
+      font-weight: bold; transition: 0.3s;
     }
+    header nav a:hover { color: #ffdd57; }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .hero h2 { font-size: 36px; margin-bottom: 10px; }
+    .hero p { font-size: 18px; opacity: 0.9; margin-bottom: 20px; }
+
+    .card {
+      background: white; color: black;
+      max-width: 500px; margin: 20px auto;
+      padding: 25px; border-radius: 12px;
+      box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+
     .tabs {
       display: flex;
-      justify-content: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
     }
     .tabs button {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
+      font-size: 16px;
+      background: none;
       border: none;
-      cursor: pointer;
       font-weight: bold;
+      cursor: pointer;
       transition: 0.3s;
     }
     .tabs button.active {
-      background: #6a11cb;
-      color: white;
-      border-radius: 8px;
+      color: #6a11cb;
+      border-bottom: 3px solid #6a11cb;
     }
-    .tabs button:hover {
-      background: #2575fc;
-      color: white;
-    }
+
     input, textarea {
       width: 90%;
       padding: 10px;
-      margin: 10px 0;
+      margin: 8px 0;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-    button.check-btn {
+
+    .check-btn {
+      display: inline-block;
       background: #6a11cb;
       color: white;
-      padding: 10px 20px;
+      padding: 12px 20px;
+      margin-top: 10px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
       transition: 0.3s;
     }
-    button.check-btn:hover {
-      background: #2575fc;
-    }
+    .check-btn:hover { background: #2575fc; }
+
     .result-box {
       margin-top: 15px;
       padding: 10px;
-      background: #f0f0f0;
-      color: black;
+      background: #f9f9f9;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 15px;
     }
-    footer {
-      margin-top: 40px;
-      font-size: 14px;
-      opacity: 0.8;
-    }
+
     .paypal-btn {
-      margin-top: 20px;
       display: inline-block;
       background: #ffc439;
       color: black;
-      padding: 10px 20px;
+      padding: 10px 18px;
       font-weight: bold;
       text-decoration: none;
       border-radius: 6px;
+      margin-top: 15px;
     }
-    .paypal-btn:hover {
-      background: #ffb347;
+    .paypal-btn:hover { background: #ffb347; }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      margin-top: 40px;
+      font-size: 14px;
+      background: rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
 <body>
 
-  <header>🚀 Reddit Shadowban Checker</header>
+  <header>
+    <h1>🚀 Reddit Shadowban Scanner</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#buy">Buy Checks</a>
+    </nav>
+  </header>
 
-  <div class="container">
+  <section class="hero">
+    <h2>Check Reddit Accounts Instantly</h2>
+    <p>Find out if a Reddit username is active or shadowbanned in seconds.</p>
+  </section>
+
+  <div class="card">
     <div class="tabs">
       <button id="singleTab" class="active">Single Check</button>
       <button id="bulkTab">Bulk Check</button>
@@ -107,70 +134,76 @@
 
     <div id="singleSection">
       <input id="singleUsername" type="text" placeholder="Enter Reddit username" />
-      <button class="check-btn" onclick="checkSingle()">Check</button>
+      <button class="check-btn" onclick="checkSingle()">🔍 Check</button>
       <div id="singleResult" class="result-box"></div>
     </div>
 
     <div id="bulkSection" style="display:none;">
-      <input id="codeInput" type="text" placeholder="Enter your API code" />
+      <input id="codeInput" type="text" placeholder="Enter API Code" />
       <textarea id="bulkUsernames" rows="4" placeholder="Enter usernames separated by space or comma"></textarea>
-      <button class="check-btn" onclick="checkBulk()">Check Bulk</button>
+      <button class="check-btn" onclick="checkBulk()">📜 Check Bulk</button>
       <div id="bulkResult" class="result-box"></div>
     </div>
   </div>
 
-  <a href="#" class="paypal-btn">💳 Buy More Checks</a>
+  <div style="text-align:center;">
+    <a id="buy" href="https://www.paypal.com/donate/?hosted_button_id=HJWC7YFZZC6V4" class="paypal-btn">💳 Donate / Buy More Checks</a>
+  </div>
 
-  <footer>© 2025 Reddit Shadowban Checker | About | Contact</footer>
+  <footer>
+    © 2025 Jack Hamnett | <a id="about" style="color: #ffdd57;">About</a> | 
+    <a id="contact" style="color: #ffdd57;">Telegram: @Sinfluenceofm</a>
+  </footer>
 
   <script>
     const backendUrl = "https://reddit-checker-8j5n.onrender.com";
 
     // Tab switching
-    document.getElementById("singleTab").addEventListener("click", () => {
-      document.getElementById("singleSection").style.display = "block";
-      document.getElementById("bulkSection").style.display = "none";
-      document.getElementById("singleTab").classList.add("active");
-      document.getElementById("bulkTab").classList.remove("active");
+    const singleTab = document.getElementById("singleTab");
+    const bulkTab = document.getElementById("bulkTab");
+    const singleSection = document.getElementById("singleSection");
+    const bulkSection = document.getElementById("bulkSection");
+
+    singleTab.addEventListener("click", () => {
+      singleTab.classList.add("active");
+      bulkTab.classList.remove("active");
+      singleSection.style.display = "block";
+      bulkSection.style.display = "none";
     });
 
-    document.getElementById("bulkTab").addEventListener("click", () => {
-      document.getElementById("singleSection").style.display = "none";
-      document.getElementById("bulkSection").style.display = "block";
-      document.getElementById("bulkTab").classList.add("active");
-      document.getElementById("singleTab").classList.remove("active");
+    bulkTab.addEventListener("click", () => {
+      bulkTab.classList.add("active");
+      singleTab.classList.remove("active");
+      singleSection.style.display = "none";
+      bulkSection.style.display = "block";
     });
 
-    // Single check function
     async function checkSingle() {
-      const username = document.getElementById("singleUsername").value;
+      const username = document.getElementById("singleUsername").value.trim();
+      if (!username) return alert("Enter a username");
       const res = await fetch(`${backendUrl}/check?user=${username}`);
       const data = await res.json();
-      document.getElementById("singleResult").innerText =
-        data.exists ? `${username} ✅ Exists` : `${username} ❌ Does not exist`;
+      document.getElementById("singleResult").textContent =
+        data.exists ? `✅ ${username} exists` : `❌ ${username} does not exist`;
     }
 
-    // Bulk check function
     async function checkBulk() {
       const code = document.getElementById("codeInput").value.trim();
-      const rawUsernames = document.getElementById("bulkUsernames").value.trim();
-      const users = rawUsernames.split(/[\s,]+/).filter(Boolean);
-
+      const text = document.getElementById("bulkUsernames").value.trim();
+      const users = text.split(/[\s,]+/).filter(Boolean);
       const res = await fetch(`${backendUrl}/check/bulk`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, users })
+        body: JSON.stringify({ code, users }),
       });
-
       const data = await res.json();
       if (!data.results) {
-        document.getElementById("bulkResult").innerText = data.error || "Error occurred.";
+        document.getElementById("bulkResult").textContent = data.error || "Error checking usernames.";
         return;
       }
-
-      let html = "<strong>Results:</strong><br/>";
+      let html = "";
       data.results.forEach(r => {
-        html += `${r.username}: ${r.exists ? "✅ Exists" : "❌ Does not exist"}<br/>`;
+        html += `${r.username}: ${r.exists ? "✅ Exists" : "❌ Not Found"}<br>`;
       });
       document.getElementById("bulkResult").innerHTML = html;
     }
