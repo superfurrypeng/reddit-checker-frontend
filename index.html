@@ -24,10 +24,7 @@
     }
     header nav a:hover { color: #ffdd57; }
 
-    .hero {
-      text-align: center;
-      padding: 60px 20px;
-    }
+    .hero { text-align: center; padding: 60px 20px; }
     .hero h2 { font-size: 36px; margin-bottom: 10px; }
     .hero p { font-size: 18px; opacity: 0.9; margin-bottom: 20px; }
 
@@ -40,74 +37,69 @@
     }
 
     .tabs {
-      display: flex;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #eee;
+      display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee;
     }
     .tabs button {
-      flex: 1;
-      padding: 12px;
-      font-size: 16px;
-      background: none;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      flex: 1; padding: 12px; font-size: 16px;
+      background: none; border: none; font-weight: bold;
+      cursor: pointer; transition: 0.3s;
     }
     .tabs button.active {
-      color: #6a11cb;
-      border-bottom: 3px solid #6a11cb;
+      color: #6a11cb; border-bottom: 3px solid #6a11cb;
     }
+    .tabs button:hover { color: #2575fc; }
 
     input, textarea {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      width: 90%; padding: 10px; margin: 8px 0;
+      border: 1px solid #ccc; border-radius: 6px;
     }
 
     .check-btn {
-      display: inline-block;
-      background: #6a11cb;
-      color: white;
-      padding: 12px 20px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
+      background: #6a11cb; color: white;
+      padding: 12px 20px; margin-top: 10px;
+      border: none; border-radius: 8px;
+      cursor: pointer; font-weight: bold;
+      transition: 0.3s; transform: scale(1);
     }
-    .check-btn:hover { background: #2575fc; }
+    .check-btn:hover { background: #2575fc; transform: scale(1.05); }
 
     .result-box {
-      margin-top: 15px;
-      padding: 10px;
-      background: #f9f9f9;
-      border-radius: 6px;
-      font-size: 15px;
+      margin-top: 15px; padding: 10px;
+      background: #f9f9f9; border-radius: 6px;
+      font-size: 15px; color: black;
+      text-align: left; max-height: 300px; overflow-y: auto;
     }
 
     .paypal-btn {
-      display: inline-block;
-      background: #ffc439;
-      color: black;
-      padding: 10px 18px;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 6px;
-      margin-top: 15px;
+      display: inline-block; background: #ffc439;
+      color: black; padding: 10px 18px; font-weight: bold;
+      text-decoration: none; border-radius: 6px;
+      margin-top: 15px; transition: 0.3s;
     }
-    .paypal-btn:hover { background: #ffb347; }
+    .paypal-btn:hover { background: #ffb347; transform: scale(1.05); }
 
     footer {
-      text-align: center;
-      padding: 25px;
-      margin-top: 40px;
-      font-size: 14px;
-      background: rgba(0, 0, 0, 0.3);
+      text-align: center; padding: 25px; margin-top: 40px;
+      font-size: 14px; background: rgba(0, 0, 0, 0.3);
     }
+
+    .modal {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+      justify-content: center; align-items: center;
+    }
+    .modal-content {
+      background: white; padding: 20px;
+      border-radius: 10px; max-width: 400px;
+      text-align: center; color: black;
+    }
+    .close-btn {
+      background: #6a11cb; color: white;
+      border: none; padding: 8px 16px;
+      margin-top: 10px; border-radius: 6px;
+      cursor: pointer; transition: 0.3s;
+    }
+    .close-btn:hover { background: #2575fc; }
   </style>
 </head>
 <body>
@@ -115,8 +107,8 @@
   <header>
     <h1>🚀 Reddit Shadowban Scanner</h1>
     <nav>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+      <a href="#" onclick="openModal('aboutModal')">About</a>
+      <a href="#" onclick="openModal('contactModal')">Contact</a>
       <a href="#buy">Buy Checks</a>
     </nav>
   </header>
@@ -130,6 +122,7 @@
     <div class="tabs">
       <button id="singleTab" class="active">Single Check</button>
       <button id="bulkTab">Bulk Check</button>
+      <button id="historyTab">History</button>
     </div>
 
     <div id="singleSection">
@@ -144,6 +137,10 @@
       <button class="check-btn" onclick="checkBulk()">📜 Check Bulk</button>
       <div id="bulkResult" class="result-box"></div>
     </div>
+
+    <div id="historySection" style="display:none;">
+      <div id="historyList" class="result-box">No history yet.</div>
+    </div>
   </div>
 
   <div style="text-align:center;">
@@ -151,40 +148,87 @@
   </div>
 
   <footer>
-    © 2025 Jack Hamnett | <a id="about" style="color: #ffdd57;">About</a> | 
-    <a id="contact" style="color: #ffdd57;">Telegram: @Sinfluenceofm</a>
+    © 2025 Jack Hamnett
   </footer>
+
+  <div class="modal" id="aboutModal">
+    <div class="modal-content">
+      <h3>About</h3>
+      <p>This tool checks Reddit usernames for shadowbans using a proxy-enabled backend API.</p>
+      <button class="close-btn" onclick="closeModal('aboutModal')">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="contactModal">
+    <div class="modal-content">
+      <h3>Contact</h3>
+      <p>Telegram: @Sinfluenceofm</p>
+      <button class="close-btn" onclick="closeModal('contactModal')">Close</button>
+    </div>
+  </div>
 
   <script>
     const backendUrl = "https://reddit-checker-8j5n.onrender.com";
 
-    // Tab switching
     const singleTab = document.getElementById("singleTab");
     const bulkTab = document.getElementById("bulkTab");
+    const historyTab = document.getElementById("historyTab");
+
     const singleSection = document.getElementById("singleSection");
     const bulkSection = document.getElementById("bulkSection");
+    const historySection = document.getElementById("historySection");
 
-    singleTab.addEventListener("click", () => {
-      singleTab.classList.add("active");
-      bulkTab.classList.remove("active");
-      singleSection.style.display = "block";
-      bulkSection.style.display = "none";
-    });
+    singleTab.onclick = () => switchTab("single");
+    bulkTab.onclick = () => switchTab("bulk");
+    historyTab.onclick = () => switchTab("history");
 
-    bulkTab.addEventListener("click", () => {
-      bulkTab.classList.add("active");
-      singleTab.classList.remove("active");
-      singleSection.style.display = "none";
-      bulkSection.style.display = "block";
-    });
+    function switchTab(tab) {
+      [singleTab, bulkTab, historyTab].forEach(b => b.classList.remove("active"));
+      [singleSection, bulkSection, historySection].forEach(s => s.style.display = "none");
+      if (tab === "single") {
+        singleTab.classList.add("active");
+        singleSection.style.display = "block";
+      } else if (tab === "bulk") {
+        bulkTab.classList.add("active");
+        bulkSection.style.display = "block";
+      } else {
+        historyTab.classList.add("active");
+        historySection.style.display = "block";
+        renderHistory();
+      }
+    }
+
+    function openModal(id) {
+      document.getElementById(id).style.display = "flex";
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    function updateHistory(username, exists) {
+      const history = JSON.parse(localStorage.getItem("history") || "[]");
+      history.unshift({ username, exists, time: new Date().toLocaleTimeString() });
+      localStorage.setItem("history", JSON.stringify(history.slice(0, 50)));
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem("history") || "[]");
+      const container = document.getElementById("historyList");
+      if (history.length === 0) {
+        container.textContent = "No history yet.";
+        return;
+      }
+      container.innerHTML = history.map(h => `<div>${h.time} - <b>${h.username}</b>: ${h.exists ? "✅ Exists" : "❌ Not Found"}</div>`).join("");
+    }
 
     async function checkSingle() {
       const username = document.getElementById("singleUsername").value.trim();
       if (!username) return alert("Enter a username");
       const res = await fetch(`${backendUrl}/check?user=${username}`);
       const data = await res.json();
-      document.getElementById("singleResult").textContent =
-        data.exists ? `✅ ${username} exists` : `❌ ${username} does not exist`;
+      const msg = data.exists ? `✅ ${username} exists` : `❌ ${username} does not exist`;
+      document.getElementById("singleResult").textContent = msg;
+      updateHistory(username, data.exists);
     }
 
     async function checkBulk() {
@@ -204,6 +248,7 @@
       let html = "";
       data.results.forEach(r => {
         html += `${r.username}: ${r.exists ? "✅ Exists" : "❌ Not Found"}<br>`;
+        updateHistory(r.username, r.exists);
       });
       document.getElementById("bulkResult").innerHTML = html;
     }
